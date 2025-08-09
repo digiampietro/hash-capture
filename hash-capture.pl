@@ -172,7 +172,7 @@ sub check_requirements {
     # check required executables
     $reqpkg{'iw'}='iw';
     $reqpkg{'airodump-ng'}='aircrack-ng';
-    $reqpkg{'cap2hccapx'}='https://github.com/hashcat/hashcat-utils';
+    $reqpkg{'hcxpcapngtool'}='https://github.com/ZerBea/hcxtools';
     $reqpkg{'iwconfig'}='wireless-tools';
     $reqpkg{'aireplay-ng'}='aircrack-ng';
     if ($bigfont) {
@@ -423,20 +423,21 @@ sub deauth_sta {
 	    mysystem($cmd);
 
 	    # ----- convert captured packets from cap to hccapx
-	    print STDERR "///// converting to hccapx\n" if ($verbose);
-	    mysystem("cap2hccapx $capfile-01.cap $capfile-01.hccapx > /dev/null 2>&1");
+	    print STDERR "///// converting to .22000\n" if ($verbose);
+	    print STDERR "///// executing: hcxpcapngtool -o $capfile-01.22000 $capfile-01.cap\n" if ($verbose); 
+	    mysystem("hcxpcapngtool -o $capfile-01.22000 $capfile-01.cap > /dev/null 2>&1");
 
 	    # ----- check if the captured packets contain handshake
-	    $hashflag=`wlanhcxinfo -i $capfile-01.hccapx 2>&1`;
-	    print STDERR "///// hashflag: $hashflag\n" if ($verbose);
-	    if ($hashflag =~ /0 records loaded/) {
-		print STDERR "///// no captured handshake\n" if ($verbose);
-		do_cleanup();
-	    } else {
+	    print STDERR "///// checking if $capfile-01.22000 has been created \n" if ($verbose);
+	    if (-e "$capfile-01.22000" && -s "$capfile-01.22000") {
 		print STDERR "----- handshake FOUND!\n";
 		$nfound++;
 		display_status();
 		do_found();
+	    } else {
+		print STDERR "///// no captured handshake\n" if ($verbose);
+		do_cleanup();
+
 	    }
 	} else {
 	    if ($verbose) {
@@ -454,17 +455,17 @@ sub deauth_sta {
 # ----- remove temporary files
 sub do_cleanup {
     if ($notRemove) {
-	print STDERR "///// NOT removing $scanfile-01.csv $capfile-01.cap $capfile-01.hccapx\n" if ($verbose)
+	print STDERR "///// NOT removing $scanfile-01.csv $capfile-01.cap $capfile-01.22000\n" if ($verbose)
     } else {
-	print STDERR "///// removing $scanfile-01.csv $capfile-01.cap $capfile-01.hccapx\n" if ($verbose);
-	unlink "$scanfile-01.csv", "$capfile-01.cap", "$capfile-01.hccapx";
+	print STDERR "///// removing $scanfile-01.csv $capfile-01.cap $capfile-01.22000\n" if ($verbose);
+	unlink "$scanfile-01.csv", "$capfile-01.cap", "$capfile-01.22000";
     }
 }
 
 # ----- handshake was found, save captured packets and update db
 sub do_found {
-    copy("$capfile-01.hccapx","$handshakesdir/$apmac.hccapx") ||
-	mydie("!!!!! Error copying to $handshakesdir/$apmac.hccapx\n");
+    copy("$capfile-01.22000","$handshakesdir/$apmac.22000") ||
+	mydie("!!!!! Error copying to $handshakesdir/$apmac.22000\n");
     $currdate=strftime "%Y%m%d-%H%M%S", localtime time;
     open(F,">> $foundfile") || mydie("!!!!! ERROR writing to $foundfile\n");
     #print F "# AP-MAC \tSTA-MAC \tAP-PWR \tSTA-PWR \tDATE \tSSID\n";

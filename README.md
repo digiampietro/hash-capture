@@ -6,6 +6,9 @@ that can be later used to offline crack passwords with
 [hashcat](https://hashcat.net/) or
 [aircrack-ng](https://www.aircrack-ng.org/).
 
+It saves a list of captured handshakes and related WiFi SSID and never
+redo the same handshake capture again.
+
 This project was inspired by [pwnagotchi](https://pwnagotchi.ai/) and
 [hashcatch](https://github.com/staz0t/hashcatch).
 
@@ -43,6 +46,14 @@ idea to my needs:
 * [Author](#author)
 <!-- md-toc-end -->
 
+# Modifications Log
+
+- **v1.0.0** original version, stores captured handshakes in `.hccapx`
+  format using the `hashcat-utils` for conversions
+- **v1.1.0** updated version to be used with newer versions of
+  `hashcat` that has deprecated the `.hccapx` format. It stores
+  captured handshakes in `.22000` fromat using the `hcxtools` for
+  conversions
 
 # Prerequisites
 
@@ -51,8 +62,8 @@ installation of the following components:
 
 * [**aircrack-ng**](https://www.aircrack-ng.org/), the script executes the
   *airodump-ng* and *aireplay-ng* commands
-* [**hashcat-utils**](https://github.com/hashcat/hashcat-utils), the
-  script executes the *cap2hccapx* command
+* [**hashcat-utils**](https://github.com/hashcat/hashcat-utils), probably not needed anymore.
+* [**hcxtools**](https://github.com/ZerBea/hcxtools)  
 * **wireless-tools** (tools for manipulating Linux Wireless
   Extensions), the script executes the *iwconfig* command
 * **iw** (tool for configuring Linux wireless devices), the script
@@ -68,7 +79,7 @@ followings (in Debian or Ubuntu based distribution):
 
 ```
 $ # install available packages
-$ sudo apt-get install aircrack-ng wireless-tools iw figlet libterm-readkey-perl
+$ sudo apt-get install aircrack-ng wireless-tools iw figlet libterm-readkey-perl hcxtools
 $ #
 $ # install from source hashcat-utils, cloning from github
 $ git clone https://github.com/hashcat/hashcat-utils
